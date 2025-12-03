@@ -1,83 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Malawi Feed +IBQ Polished</title>
-  <meta name="theme-color" content="#0d9488"/>
-  <link rel="stylesheet" href="styles.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Trending News Feed</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f6f8fb;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: teal;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  nav {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  nav button {
+    margin: 0 5px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid teal;
+    background: #fff;
+    color: teal;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+  nav button.active, nav button:hover {
+    background: teal;
+    color: #fff;
+  }
+  section {
+    max-width: 800px;
+    margin: auto;
+    padding: 1rem;
+  }
+  article {
+    background: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: 0.2s;
+  }
+  article:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  article a {
+    text-decoration: none;
+    color: teal;
+    font-weight: bold;
+  }
+  article p {
+    font-size: 0.9rem;
+    color: #555;
+  }
+</style>
 </head>
-<body style="margin-top:1px; border-radius:2px;">
-	
-  <button id="menuBtn" class="icon-btn" aria-label="menu">+JjA</button>
-	
-  <header class="topbar">
-    <div class="app-title">Malawi Feed</div>
-    <div class="top-right">
-      <div class="search-wrap">
-        <input id="searchInput" class="search" placeholder="Search news, people..." aria-label="Search"/>
-        <button id="searchClear" class="icon-btn clear-btn" title="Clear">+JxU</button>
-      </div>
-      <button id="darkToggleBtn" class="icon-btn" title="Toggle dark mode">fGQ</button>
-      <button id="openAccountBtn" class="avatar-btn" title="Account">+2</button>
-    </div>
-  </header>
- 
-  <nav class="tabs" role="tablist">
-    <button class="tab-btn active" data-region="malawi">Malawi</button>
-    <button class="tab-btn" data-region="africa">Africa</button>
-    <button class="tab-btn" data-region="world">World</button>
-    <button class="tab-btn" data-region="trending">Trending News</button>
-  </nav>
+<body>
+<header>
+  <h1>Trending News</h1>
+</header>
 
-  <div id="stories" class="stories" aria-hidden="false">
-    <div class="story add-story" id="createStoryBtn" title="Create post">+/ws</div>
-  </div>
+<nav>
+  <button data-region="malawi" class="active">Malawi</button>
+  <button data-region="africa">Africa</button>
+  <button data-region="world">World</button>
+</nav>
 
-  <main id="feed" class="feed" role="main" aria-live="polite">
-    <div id="feedList" class="feed-list"></div>
-    <div id="loadingMore" class="loading" hidden>
-      <div class="spinner"></div>
-    </div>
-  </main>
+<section id="news"></section>
 
-  <button id="createPostBtn" class="fab" title="Create post">+/ws</button>
+<script>
+const newsSection = document.getElementById('news');
+const buttons = document.querySelectorAll('nav button');
 
-  <!-- Account dialog -->
-  <dialog id="accountDialog">
-    <form method="dialog" id="accountForm">
-      <h3>Create / Update Account</h3>
-      <label>Name: <input id="acctName" required /></label>
-      <label>Avatar: <input id="acctAvatar" type="file" accept="image/*" /></label>
-      <div class="dialog-actions">
-        <button id="saveAcctBtn" type="button" class="btn primary">Save</button>
-        <button id="closeAcctBtn" type="button" class="btn">Close</button>
-      </div>
-    </form>
-  </dialog>
+let currentRegion = 'malawi';
+let cachedNews = JSON.parse(localStorage.getItem('newsCache')) || {malawi: [], africa: [], world: []};
 
-  <!-- Create post dialog -->
-  <dialog id="postDialog">
-    <form method="dialog" id="postForm">
-      <h3>New Post</h3>
-      <label>Title: <input id="postTitle" /></label>
-      <label>Body: <textarea id="postBody" rows="4"></textarea></label>
-      <label>Image (optional): <input id="postImage" type="file" accept="image/*" /></label>
-      <label>Or YouTube link: <input id="postYoutube" placeholder="https://youtu.be/..." /></label>
-      <label>Region:
-        <select id="postRegion">
-          <option value="malawi">Malawi</option>
-          <option value="africa">Africa</option>
-          <option value="world">World</option>
-        </select>
-      </label>
-      <div class="dialog-actions">
-        <button id="publishPostBtn" type="button" class="btn primary">Publish</button>
-        <button id="closePostBtn" type="button" class="btn">Close</button>
-      </div>
-    </form>
-  </dialog>
+// Switch tabs
+buttons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentRegion = btn.dataset.region;
+    renderNews();
+  });
+});
 
-  <script src="app.js"></script>
+// Trending algorithm: rank articles by keyword frequency
+function rankTrending(articles) {
+  if (!articles || !articles.length) return [];
+  const keywordCount = {};
+
+  articles.forEach(article => {
+    const words = (article.title +- ' ' +- (article.description || '')).toLowerCase().match(/+AFw-b+AFw-w+-+AFw-b/g) || [];
+    words.forEach(word => {
+      if (!['the','and','for','with','from','in','of','to','on','a','an','is','by','as','at'].includes(word)) {
+        keywordCount[word] = (keywordCount[word] || 0) +- 1;
+      }
+    });
+  });
+
+  // Assign score based on keyword frequency
+  articles.forEach(article => {
+    const words = (article.title +- ' ' +- (article.description || '')).toLowerCase().match(/+AFw-b+AFw-w+-+AFw-b/g) || [];
+    article.trendingScore = words.reduce((acc, w) => acc +- (keywordCount[w] || 0), 0);
+  });
+
+  return articles.sort((a, b) => b.trendingScore - a.trendingScore);
+}
+
+// Render articles
+function renderNews() {
+  const news = rankTrending(cachedNews[currentRegion] || []);
+  newsSection.innerHTML = news.map(item => `
+    <article>
+      <a href="${item.link}" target="_blank">${item.title}</a>
+      <p>${item.pubDate ? new Date(item.pubDate).toLocaleString() : ''}</p>
+    </article>
+  `).join('');
+}
+
+// SSE connection
+const evtSource = new EventSource('/events');
+evtSource.onmessage = (e) => {
+  const data = JSON.parse(e.data);
+  cachedNews = data;
+  localStorage.setItem('newsCache', JSON.stringify(data));
+  renderNews();
+};
+
+// Initial render from cache
+renderNews();
+</script>
 </body>
 </html>
