@@ -1,26 +1,13 @@
-# render.yaml - Render deployment configuration
 services:
   - type: web
-    name: malawi-news-server
+    name: trending-news-app
     env: node
     plan: free
-    buildCommand: "npm install"
-    startCommand: "node server.js"
     region: oregon
-    envVars:
-      - key: NODE_ENV
-        value: "production"
+    buildCommand: "npm install"
+    startCommand: "npm start"
     autoDeploy: true
-    pullRequestPreviewsEnabled: true
-    disk: 512
-
-  - type: static
-    name: malawi-news-frontend
-    buildCommand: ""
-    publishPath: "/public"
     branch: main
-    envVars:
-      - key: NODE_ENV
-        value: "production"
-    autoDeploy: true
-    pullRequestPreviewsEnabled: true
+    routes:
+      - type: static
+        path: /
