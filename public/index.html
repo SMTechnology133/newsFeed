@@ -1,1 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Malawi Feed +IBQ Polished</title>
+  <meta name="theme-color" content="#0d9488"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body style="margin-top:1px; border-radius:2px;">
+	
+  <button id="menuBtn" class="icon-btn" aria-label="menu">+JjA</button>
+	
+  <header class="topbar">
+    <div class="app-title">Malawi Feed</div>
+    <div class="top-right">
+      <div class="search-wrap">
+        <input id="searchInput" class="search" placeholder="Search news, people..." aria-label="Search"/>
+        <button id="searchClear" class="icon-btn clear-btn" title="Clear">+JxU</button>
+      </div>
+      <button id="darkToggleBtn" class="icon-btn" title="Toggle dark mode">fGQ</button>
+      <button id="openAccountBtn" class="avatar-btn" title="Account">+2</button>
+    </div>
+  </header>
+ 
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-region="malawi">Malawi</button>
+    <button class="tab-btn" data-region="africa">Africa</button>
+    <button class="tab-btn" data-region="world">World</button>
+    <button class="tab-btn" data-region="trending">Trending News</button>
+  </nav>
 
+  <div id="stories" class="stories" aria-hidden="false">
+    <div class="story add-story" id="createStoryBtn" title="Create post">+/ws</div>
+  </div>
+
+  <main id="feed" class="feed" role="main" aria-live="polite">
+    <div id="feedList" class="feed-list"></div>
+    <div id="loadingMore" class="loading" hidden>
+      <div class="spinner"></div>
+    </div>
+  </main>
+
+  <button id="createPostBtn" class="fab" title="Create post">+/ws</button>
+
+  <!-- Account dialog -->
+  <dialog id="accountDialog">
+    <form method="dialog" id="accountForm">
+      <h3>Create / Update Account</h3>
+      <label>Name: <input id="acctName" required /></label>
+      <label>Avatar: <input id="acctAvatar" type="file" accept="image/*" /></label>
+      <div class="dialog-actions">
+        <button id="saveAcctBtn" type="button" class="btn primary">Save</button>
+        <button id="closeAcctBtn" type="button" class="btn">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Create post dialog -->
+  <dialog id="postDialog">
+    <form method="dialog" id="postForm">
+      <h3>New Post</h3>
+      <label>Title: <input id="postTitle" /></label>
+      <label>Body: <textarea id="postBody" rows="4"></textarea></label>
+      <label>Image (optional): <input id="postImage" type="file" accept="image/*" /></label>
+      <label>Or YouTube link: <input id="postYoutube" placeholder="https://youtu.be/..." /></label>
+      <label>Region:
+        <select id="postRegion">
+          <option value="malawi">Malawi</option>
+          <option value="africa">Africa</option>
+          <option value="world">World</option>
+        </select>
+      </label>
+      <div class="dialog-actions">
+        <button id="publishPostBtn" type="button" class="btn primary">Publish</button>
+        <button id="closePostBtn" type="button" class="btn">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
