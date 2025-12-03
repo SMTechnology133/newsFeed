@@ -1,0 +1,19 @@
+{
+  "name": "malawi-newsfeed-polished-teal",
+  "version": "1.0.0",
+  "description": "Polished Malawi/Africa/World feed +IBQ SSE, RSS (no keys), trending, dark mode, teal accents",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "rss-parser": "^3.12.0"
+  }
+}
